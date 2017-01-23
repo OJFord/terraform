@@ -3,6 +3,7 @@ package scaleway
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -25,6 +26,10 @@ func resourceScalewayVolumeAttachment() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
+			},
+			"device_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 		},
 	}
@@ -159,6 +164,7 @@ func resourceScalewayVolumeAttachmentRead(d *schema.ResourceData, m interface{})
 
 	for _, volume := range server.Volumes {
 		if volume.Identifier == d.Get("volume").(string) {
+			d.Set("device_name", strings.TrimPrefix(volume.ExportURI, "device:/"))
 			return nil
 		}
 	}
